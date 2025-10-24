@@ -8,11 +8,9 @@ package com.mycompany.gestionrecettes.model.ghada;
  *
  * @author farah ajmi
  */
-package model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 
 public class ListeCourse {
     private int id;
