@@ -8,81 +8,64 @@ package com.mycompany.gestionrecettes.model.ghada;
  *
  * @author farah ajmi
  */
+
+import java.util.Objects;
+
 public class ArticleCourse {
-    private int id;
-    private String nom;
-    private double quantite;
-    
-    // Constructeurs
-    public ArticleCourse() {}
-    
-    public ArticleCourse(String nom, double quantite) {
-        this.nom = nom;
-        this.quantite = quantite;
+    private Ingredient ingredient;
+    private double quantiteTotale;
+    private String unite;
+
+    public ArticleCourse(Ingredient ingredient, double quantiteTotale, String unite) {
+        this.ingredient = ingredient;
+        this.quantiteTotale = quantiteTotale;
+        this.unite = unite;
     }
-    
-    public ArticleCourse(int id, String nom, double quantite) {
-        this.id = id;
-        this.nom = nom;
-        this.quantite = quantite;
+
+    public Ingredient getIngredient() {
+        return ingredient;
     }
-    
-    // Getters et Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    
-    public String getNom() { return nom; }
-    public void setNom(String nom) { this.nom = nom; }
-    
-    public double getQuantite() { return quantite; }
-    public void setQuantite(double quantite) { 
-        if (quantite >= 0) {
-            this.quantite = quantite; 
-        }
+
+    public void setIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
     }
-    
-    // Méthodes de validation
-    public boolean estValide() {
-        return nom != null && !nom.trim().isEmpty() && quantite >= 0;
+
+    public double getQuantiteTotale() {
+        return quantiteTotale;
     }
-    
-    // Méthodes de formatage
-    public String getQuantiteFormatee() {
-        if (quantite == (long) quantite) {
-            return String.format("%d", (long) quantite);
-        } else {
-            return String.format("%.2f", quantite);
-        }
+
+    public void setQuantiteTotale(double quantiteTotale) {
+        this.quantiteTotale = quantiteTotale;
     }
-    
-    // Méthodes de comparaison
-    public boolean estSimilaire(ArticleCourse autre) {
-        if (autre == null) return false;
-        return this.nom.equalsIgnoreCase(autre.nom);
+
+    public String getUnite() {
+        return unite;
     }
-    
-    public void fusionnerAvec(ArticleCourse autre) {
-        if (estSimilaire(autre)) {
-            this.quantite += autre.quantite;
-        }
+
+    public void setUnite(String unite) {
+        this.unite = unite;
     }
-    
+
+    public void ajouterQuantite(double qte) {
+        this.quantiteTotale += qte;
+    }
+
     @Override
-    public String toString() {
-        return String.format("ArticleCourse{id=%d, nom='%s', quantite=%s}", 
-                           id, nom, getQuantiteFormatee());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ArticleCourse)) return false;
+        ArticleCourse that = (ArticleCourse) o;
+        return Objects.equals(ingredient, that.ingredient)
+                && Objects.equals(unite, that.unite);
     }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        ArticleCourse other = (ArticleCourse) obj;
-        return id == other.id;
-    }
-    
+
     @Override
     public int hashCode() {
-        return Integer.hashCode(id);
+        return Objects.hash(ingredient, unite);
+    }
+
+    @Override
+    public String toString() {
+        return ingredient.getNom() + " : " + quantiteTotale + " " + unite;
     }
 }

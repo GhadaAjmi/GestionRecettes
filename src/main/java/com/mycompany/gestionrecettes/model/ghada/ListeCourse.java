@@ -8,143 +8,129 @@ package com.mycompany.gestionrecettes.model.ghada;
  *
  * @author farah ajmi
  */
+package model;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ListeCourse {
     private int id;
     private String nom;
     private Date dateCreation;
-    private List<ArticleCourse> articles;
-    
+    private HashSet<ArticleCourse> articles;
+
     // Constructeurs
     public ListeCourse() {
+        this.articles = new HashSet<>();
         this.dateCreation = new Date();
-        this.articles = new ArrayList<>();
     }
-    
-    public ListeCourse(String nom) {
-        this();
+
+    public ListeCourse(int id, String nom) {
+        this.id = id;
         this.nom = nom;
+        this.dateCreation = new Date();
+        this.articles = new HashSet<>();
     }
-    
-    // Getters et Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    
-    public String getNom() { return nom; }
-    public void setNom(String nom) { this.nom = nom; }
-    
-    public Date getDateCreation() { return dateCreation; }
-    public void setDateCreation(Date dateCreation) { this.dateCreation = dateCreation; }
-    
-    public List<ArticleCourse> getArticles() { return articles; }
-    public void setArticles(List<ArticleCourse> articles) { this.articles = articles; }
-    
-    // Méthodes de gestion des articles
-    public void ajouterArticle(ArticleCourse article) {
-        if (article != null && article.estValide()) {
-            // Vérifier si un article similaire existe déjà
-            Optional<ArticleCourse> articleExistant = articles.stream()
-                    .filter(a -> a.estSimilaire(article))
-                    .findFirst();
-            
-            if (articleExistant.isPresent()) {
-                // Fusionner avec l'article existant
-                articleExistant.get().fusionnerAvec(article);
-            } else {
-                // Ajouter le nouvel article
-                articles.add(article);
+
+    // =============================
+    // Méthodes principales
+    // =============================
+
+    /** Ajoute un article ou cumule la quantité s'il existe déjà */
+    public void ajouterArticle(Ingredient ingredient, double quantite, String unite) {
+        ArticleCourse nouveau = new ArticleCourse(ingredient, quantite, unite);
+
+        for (ArticleCourse ac : articles) {
+            if (ac.equals(nouveau)) {
+                ac.ajouterQuantite(quantite);
+                return;
+            }
+        }
+        articles.add(nouveau);
+    }
+
+    /** Supprime un article correspondant à un ingrédient et unité */
+    public boolean supprimerArticle(Ingredient ingredient, String unite) {
+        return articles.removeIf(ac ->
+            ac.getIngredient().equals(ingredient) &&
+            ac.getUnite().equals(unite)
+        );
+    }
+
+    /** Génère automatiquement la liste à partir d’un planificateur */
+    public void genererDepuisPlanificateur(Planificateur planificateur) {
+        articles.clear();
+        if (planificateur == null) return;
+
+        for (HashSet<RepasPlanifie> repasSet : planificateur.getTousLesRepas()) {
+            for (RepasPlanifie repas : repasSet) {
+                Menu menu = repas.getMenu();
+                if (menu == null || menu.getRecettes() == null) continue;
+
+                for (Recette recette : menu.getRecettes()) {
+                    if (recette.getIngredientsQuantifies() == null) continue;
+
+                    for (IngredientQuantifie iq : recette.getIngredientsQuantifies()) {
+                        double quantiteTotale = iq.getQuantite() * repas.getNbPersonnes();
+                        ajouterArticle(iq.getIngredient(), quantiteTotale, iq.getUnite());
+                    }
+                }
             }
         }
     }
-    
-    public void supprimerArticle(ArticleCourse article) {
-        articles.remove(article);
+
+    // =============================
+    // Getters / Setters
+    // =============================
+
+    public int getId() {
+        return id;
     }
-    
-    public void supprimerArticleParId(int id) {
-        articles.removeIf(article -> article.getId() == id);
+
+    public void setId(int id) {
+        this.id = id;
     }
-    
-    public ArticleCourse getArticleParId(int id) {
-        return articles.stream()
-                .filter(article -> article.getId() == id)
-                .findFirst()
-                .orElse(null);
+
+    public String getNom() {
+        return nom;
     }
-    
-    public void viderListe() {
-        articles.clear();
+
+    public void setNom(String nom) {
+        this.nom = nom;
     }
-    
-    // Méthodes de calcul
-    public int getNombreArticles() {
-        return articles.size();
+
+    public Date getDateCreation() {
+        return dateCreation;
     }
-    
-    public double getQuantiteTotale() {
-        return articles.stream()
-                .mapToDouble(ArticleCourse::getQuantite)
-                .sum();
+
+    public void setDateCreation(Date dateCreation) {
+        this.dateCreation = dateCreation;
     }
-    
-    // Méthodes de recherche
-    public List<ArticleCourse> rechercherParNom(String nom) {
-        return articles.stream()
-                .filter(article -> article.getNom().toLowerCase().contains(nom.toLowerCase()))
-                .collect(Collectors.toList());
+
+    public HashSet<ArticleCourse> getArticles() {
+        return articles;
     }
-    
-    public boolean contientArticle(String nomArticle) {
-        return articles.stream()
-                .anyMatch(article -> article.getNom().equalsIgnoreCase(nomArticle));
+
+    public void setArticles(HashSet<ArticleCourse> articles) {
+        this.articles = articles;
     }
-    
-    // Méthodes de tri
-    public void trierParNom() {
-        articles.sort((a1, a2) -> a1.getNom().compareToIgnoreCase(a2.getNom()));
-    }
-    
-    public void trierParQuantite() {
-        articles.sort((a1, a2) -> Double.compare(a2.getQuantite(), a1.getQuantite()));
-    }
-    
-    // Méthodes de validation
-    public boolean estValide() {
-        return nom != null && !nom.trim().isEmpty() && articles != null;
-    }
-    
-    public boolean estVide() {
-        return articles.isEmpty();
-    }
-    
-    // Méthodes d'information
-    public String getResume() {
-        return String.format("%s - %d articles", nom, getNombreArticles());
-    }
-    
-    public String getDateCreationFormatee() {
-        return String.format("%1$td/%1$tm/%1$tY", dateCreation);
-    }
-    
+
+    // =============================
+    // toString()
+    // =============================
     @Override
     public String toString() {
-        return String.format("ListeCourse{id=%d, nom='%s', articles=%d}", 
-                           id, nom, articles.size());
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        ListeCourse other = (ListeCourse) obj;
-        return id == other.id;
-    }
-    
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
+        StringBuilder sb = new StringBuilder();
+        sb.append("ListeCourse{id=").append(id)
+          .append(", nom='").append(nom).append('\'')
+          .append(", dateCreation=").append(dateCreation)
+          .append(", articles=\n");
+
+        for (ArticleCourse ac : articles) {
+            sb.append("  - ").append(ac).append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 }
