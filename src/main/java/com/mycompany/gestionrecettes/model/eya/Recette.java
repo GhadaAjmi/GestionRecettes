@@ -111,6 +111,40 @@ public void afficherCommentaires() {
        
     }
 }
+   public int calculerTempsAvecChronometreur(ChronometreurEtape chronometreur) {
+    return chronometreur.calculerTempsTotal(this.etapes);
+}
+   
+   public int getTempsTotalEtapes() {
+    ChronometreurEtape chronoSimple = (etapes) -> etapes.values().stream()
+            .mapToInt(Etape::getDuree)
+            .sum();
+    return calculerTempsAvecChronometreur(chronoSimple);
+}
+   
+   public Etape getEtapeLaPlusLongue() {
+    return etapes.values().stream()
+        .max(Comparator.comparingInt(Etape::getDuree))
+        .orElse(null); 
+}
+  public void verifierCoherenceTemps(){
+      int tempsEtapes = getTempsTotalEtapes();
+      if(this.tempsPreparation != tempsEtapes){
+          throw new TempsPreparationException(this.tempsPreparation, tempsEtapes);
+      }
+  }
+  public void corrigerTempsPreparation(){
+      try{
+          verifierCoherenceTemps();
+          System.out.println("Temps de preparation coherent: "+ this.tempsPreparation+"minutes");
+      }
+      catch (TempsPreparationException e){
+          System.err.println(e.getMessage());
+          this.tempsPreparation = e.getTempsCalcule();
+          System.out.println("Correction appliquée : " +this.tempsPreparation+" minutes");
+          
+      }
+  }
 
     
     @Override
