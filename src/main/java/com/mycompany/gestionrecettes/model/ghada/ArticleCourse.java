@@ -8,6 +8,7 @@ package com.mycompany.gestionrecettes.model.ghada;
  *
  * @author farah ajmi
  */
+import com.mycompany.gestionrecettes.model.eya.Ingredient;
 
 import java.util.Objects;
 

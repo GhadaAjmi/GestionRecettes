@@ -8,6 +8,7 @@ package com.mycompany.gestionrecettes.model.ghada;
  *
  * @author farah ajmi
  */
+import com.mycompany.gestionrecettes.model.eya.Recette;
 
 public class MenuRecette {
     private int id;
