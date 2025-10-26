@@ -12,10 +12,9 @@ import java.util.Map;
  * @author farah ajmi
  */
 public interface CalculateurIngredients {
-    public interface SourceIngredients {
         Map<Ingredient, Double> getIngredientsEtQuantites();
 
     
-}
+
 
 }
