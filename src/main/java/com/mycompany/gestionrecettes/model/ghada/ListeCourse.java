@@ -9,79 +9,38 @@ package com.mycompany.gestionrecettes.model.ghada;
  * @author farah ajmi
  */
 
+import com.mycompany.gestionrecettes.model.eya.Ingredient;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class ListeCourse {
     private int id;
     private String nom;
     private Date dateCreation;
-    private HashSet<ArticleCourse> articles;
+    private HashMap<Ingredient, Double> ingredients; 
+    private static int compteurId = 0;
 
-    // Constructeurs
+    // -------------------- CONSTRUCTEURS --------------------
     public ListeCourse() {
-        this.articles = new HashSet<>();
+        this.id = ++compteurId;
         this.dateCreation = new Date();
+        this.ingredients = new HashMap<>();
     }
 
-    public ListeCourse(int id, String nom) {
-        this.id = id;
+    public ListeCourse(String nom) {
+        this();
         this.nom = nom;
-        this.dateCreation = new Date();
-        this.articles = new HashSet<>();
     }
 
-    // =============================
-    // Méthodes principales
-    // =============================
-
-    /** Ajoute un article ou cumule la quantité s'il existe déjà */
-    public void ajouterArticle(Ingredient ingredient, double quantite, String unite) {
-        ArticleCourse nouveau = new ArticleCourse(ingredient, quantite, unite);
-
-        for (ArticleCourse ac : articles) {
-            if (ac.equals(nouveau)) {
-                ac.ajouterQuantite(quantite);
-                return;
-            }
-        }
-        articles.add(nouveau);
+    public ListeCourse(String nom, Date dateCreation) {
+        this();
+        this.nom = nom;
+        this.dateCreation = dateCreation;
     }
 
-    /** Supprime un article correspondant à un ingrédient et unité */
-    public boolean supprimerArticle(Ingredient ingredient, String unite) {
-        return articles.removeIf(ac ->
-            ac.getIngredient().equals(ingredient) &&
-            ac.getUnite().equals(unite)
-        );
-    }
-
-    /** Génère automatiquement la liste à partir d’un planificateur */
-    public void genererDepuisPlanificateur(Planificateur planificateur) {
-        articles.clear();
-        if (planificateur == null) return;
-
-        for (HashSet<RepasPlanifie> repasSet : planificateur.getTousLesRepas()) {
-            for (RepasPlanifie repas : repasSet) {
-                Menu menu = repas.getMenu();
-                if (menu == null || menu.getRecettes() == null) continue;
-
-                for (Recette recette : menu.getRecettes()) {
-                    if (recette.getIngredientsQuantifies() == null) continue;
-
-                    for (IngredientQuantifie iq : recette.getIngredientsQuantifies()) {
-                        double quantiteTotale = iq.getQuantite() * repas.getNbPersonnes();
-                        ajouterArticle(iq.getIngredient(), quantiteTotale, iq.getUnite());
-                    }
-                }
-            }
-        }
-    }
-
-    // =============================
-    // Getters / Setters
-    // =============================
-
+    // -------------------- GETTERS/SETTERS --------------------
     public int getId() {
         return id;
     }
@@ -106,29 +65,77 @@ public class ListeCourse {
         this.dateCreation = dateCreation;
     }
 
-    public HashSet<ArticleCourse> getArticles() {
-        return articles;
+    public HashMap<Ingredient, Double> getIngredients() {
+        return ingredients ;
     }
 
-    public void setArticles(HashSet<ArticleCourse> articles) {
-        this.articles = articles;
+    // -------------------- GESTION DES INGRÉDIENTS --------------------
+    public void ajouterIngredient(Ingredient ingredient, double quantite) {
+        if (ingredient != null && quantite > 0) {
+            ingredients.merge(ingredient, quantite, Double::sum);
+        }
     }
 
-    // =============================
-    // toString()
-    // =============================
+    public void supprimerIngredient(Ingredient ingredient) {
+        ingredients.remove(ingredient);
+    }
+
+    public double getQuantite(Ingredient ingredient) {
+        return ingredients.getOrDefault(ingredient, 0.0);
+    }
+
+    public boolean contientIngredient(Ingredient ingredient) {
+        return ingredients.containsKey(ingredient);
+    }
+
+    public void viderListe() {
+        ingredients.clear();
+    }
+
+    public int getNombreIngredients() {
+        return ingredients.size();
+    }
+
+    public boolean estVide() {
+        return ingredients.isEmpty();
+    }
+
+    // -------------------- EQUALS, HASHCODE, TOSTRING --------------------
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ListeCourse that = (ListeCourse) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("ListeCourse{id=").append(id)
-          .append(", nom='").append(nom).append('\'')
-          .append(", dateCreation=").append(dateCreation)
-          .append(", articles=\n");
+        return "ListeCourse{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", dateCreation=" + dateCreation +
+                ", nombreIngredients=" + ingredients.size() +
+                '}';
+    }
 
-        for (ArticleCourse ac : articles) {
-            sb.append("  - ").append(ac).append("\n");
+    // Méthode pour afficher le détail de la liste
+    public String afficherDetail() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Liste: ").append(nom).append("\n");
+        sb.append("Date: ").append(dateCreation).append("\n");
+        sb.append("Ingrédients:\n");
+        
+        for (Map.Entry<Ingredient, Double> entry : ingredients.entrySet()) {
+            sb.append("- ").append(entry.getKey().getNom())
+              .append(": ").append(entry.getValue()).append("\n");
         }
-        sb.append("}");
+        
         return sb.toString();
     }
 }
