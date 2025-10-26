@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class RepasPlanifie implements SourceIngredients {
+public final class RepasPlanifie implements CalculateurIngredients {
     private int id;
     private LocalDate date;
     private int nbPersonnes;

@@ -14,8 +14,9 @@ import com.mycompany.gestionrecettes.model.ghada.Exceptions.TypeMenuDupliqueExce
 import com.mycompany.gestionrecettes.model.ghada.Exceptions.TypeMenuManquantException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public final class Planificateur implements SourceIngredients{
+public final class Planificateur implements CalculateurIngredients{
     private int id;
     private LocalDate dateDebut;
     private LocalDate dateFin;
@@ -199,7 +200,32 @@ public RepasPlanifie getRepas(LocalDate date, TypeMenu type) {
         
         return liste;
     }
+// Récupérer tous les repas d'un type spécifique avec Stream
+    public List<RepasPlanifie> getRepasParType(TypeMenu type) {
+        return repas.values().stream()                           
+            .map(repasDuJour -> repasDuJour.get(type))           
+            .filter(Objects::nonNull)                            
+            .collect(Collectors.toList());                       
+    }
 
+
+      // -------------------- Classe Anonyme (Comparator) --------------------
+ 
+    public List<RepasPlanifie> trierAvecListSort() {
+    List<RepasPlanifie> tousRepas = new ArrayList<>();
+    for (HashMap<TypeMenu, RepasPlanifie> repasDuJour : repas.values()) {
+        tousRepas.addAll(repasDuJour.values());
+    }
+    
+    tousRepas.sort(new Comparator<RepasPlanifie>() {
+        @Override
+        public int compare(RepasPlanifie r1, RepasPlanifie r2) {
+            return Integer.compare(r1.getNbPersonnes(), r2.getNbPersonnes());
+        }
+    });
+    
+    return tousRepas;
+}
 
    // -------------------- INTERFACE IMPLEMENTATION --------------------
     @Override

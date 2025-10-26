@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ListeCourse {
+public final class ListeCourse {
     private int id;
     private String nom;
     private Date dateCreation;
