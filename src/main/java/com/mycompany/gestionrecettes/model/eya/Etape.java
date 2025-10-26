@@ -8,7 +8,7 @@ package com.mycompany.gestionrecettes.model.eya;
  *
  * @author MSI
  */
-public class Etape {
+public final class Etape {
     private String Description;
     private String Conseils;
     private int Duree;

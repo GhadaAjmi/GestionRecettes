@@ -8,7 +8,7 @@ import java.util.*;
  *
  * @author MSI
  */
-public class Recette {
+public final class Recette {
     private int id;
     private String titre;
     private String description;
