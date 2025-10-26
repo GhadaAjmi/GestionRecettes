@@ -8,7 +8,7 @@ package com.mycompany.gestionrecettes.model.eya;
  *
  * @author MSI
  */
-public class Ingredient {
+public final class Ingredient {
     private int id;
     private String nom;
     private String description;
@@ -26,7 +26,7 @@ public class Ingredient {
     public void setId(int id){this.id = id;}
     
     public String getNom(){return nom;}
-    public void setNom(){this.nom = nom;}
+    public void setNom(String nom){this.nom = nom;}
     
     public String getDescription(){return description;}
     public void setDescription(String description){this.description = description;}

@@ -8,7 +8,7 @@ package com.mycompany.gestionrecettes.model.eya;
  *
  * @author MSI
  */
-public class IngredientQuantifie {
+public final class IngredientQuantifie {
     private int id;
     private double quantite;
     private Ingredient ingredient;
