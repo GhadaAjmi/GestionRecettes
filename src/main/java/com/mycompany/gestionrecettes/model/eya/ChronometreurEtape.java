@@ -4,6 +4,7 @@
  */
 package com.mycompany.gestionrecettes.model.eya;
 import java.util.Map;
+
 /**
  *
  * @author MSI
